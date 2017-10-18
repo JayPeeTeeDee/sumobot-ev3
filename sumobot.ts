@@ -40,18 +40,18 @@ if (ev3.connected(gyroSensor)) {
 
 var calib_rotate_distance = 95;
 var black_val = 10;
-
+var white_val = 50;
 var target_distance = 40;
 var view_angle = 60;
 
 function turnClockwise() {
-    ev3.runForTime(motorA, 1000, -200);
-    ev3.runForTime(motorB, 1000, 200);
+    ev3.runForTime(motorA, 1000, -500);
+    ev3.runForTime(motorB, 1000, 500);
 }
 
 function turnAntiClockwise() {
-    ev3.runForTime(motorA, 1000, 200);
-    ev3.runForTime(motorB, 1000, -200);
+    ev3.runForTime(motorA, 1000, 500);
+    ev3.runForTime(motorB, 1000, -500);
 }
 
 function faceEnemy(bearing) {
@@ -68,6 +68,27 @@ function faceEnemy(bearing) {
     } else {
         ev3.runUntil(rightBearingHit, turnClockwise);
     }
+}
+
+function check_bumper() {
+  return ev3.touchSensorPressed(touchSensor);
+}
+
+function defend() {
+  faceEnemy(180);
+  move_forward(1000);
+}
+
+function state_wrapper(next_function) {
+    if (ev3.reflectedLightIntensity(colorSensor) > white_val || check_bumper()) {
+        defend();
+        if (ev3.ultrasonicSensorDistance(ultrasonic) <= target_distance) {
+          return state_wrapper(assault);
+        } else {
+          return state_wrapper(search);
+        }
+    }
+    next_function();
 }
 
 function search() {
@@ -91,9 +112,9 @@ function search() {
    var enemy_bearing = current_angle - front_position;
    if(object_distance <= target_distance) {
      faceEnemy(enemy_bearing);
-     return source.pair(1, 1);
+     return state_wrapper(assault);
    } else {
-     search();
+     return state_wrapper(search);
  }
 }
 
@@ -101,32 +122,18 @@ function assault() {
     ev3.runForTime(motorA, 5000, 700);
     ev3.runForTime(motorB, 5000, 700);
     if (ev3.ultrasonicSensorDistance(ultrasonic) <= target_distance) {
-      return assault();
+      return state_wrapper(assault);
     } else {
       return state_wrapper(search);
     }
 }
 
-function check_bumper() {
-  return (ev3.touchSensorPressed(touchSensor)) ? true : check_bumper();
-}
 
 function move_forward(distance) {
     ev3.runForDistance(motorA, distance, 700);
     ev3.runForDistance(motorB, distance, 700);
 }
 
-function defend() {
-  faceEnemy(180);
-  move_forward(50);
-  if (ev3.ultrasonicSensorDistance(ultrasonic) <= target_distance) {
-    return assault();
-  } else {
-    return state_wrapper(search);
-  }
-}
-
-while(true) {
-   var res = search();
-   source.alert(res);
-}
+//Starter function
+ev3.waitForButtonPress();
+state_wrapper(search);
