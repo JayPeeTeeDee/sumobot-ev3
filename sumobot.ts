@@ -97,12 +97,14 @@ function search() {
  }
 }
 
-function assault(object_distance) {
-    while (ev3.ultrasonicSensorDistance(ultrasonic) <= object_distance) {
-      ev3.runForTime(motorA, 5000, 700);
-      ev3.runForTime(motorB, 5000, 700);
+function assault() {
+    ev3.runForTime(motorA, 5000, 700);
+    ev3.runForTime(motorB, 5000, 700);
+    if (ev3.ultrasonicSensorDistance(ultrasonic) <= target_distance) {
+      return assault();
+    } else {
+      return state_wrapper(search);
     }
-    search();
 }
 
 function check_bumper() {
@@ -115,14 +117,13 @@ function move_forward(distance) {
 }
 
 function defend() {
-  function turn_180() {
-    // to calibrate
-    ev3.runForDistance(motorA, -170, 500);
-    ev3.runForDistance(motorB, 170, 500);
-    ev3.pause(2000);
-  }
-  turn_180();
+  faceEnemy(180);
   move_forward(50);
+  if (ev3.ultrasonicSensorDistance(ultrasonic) <= target_distance) {
+    return assault();
+  } else {
+    return state_wrapper(search);
+  }
 }
 
 while(true) {
