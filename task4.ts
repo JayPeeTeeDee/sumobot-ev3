@@ -24,63 +24,30 @@ if (ev3.connected(gyro)) {
 }
 
 var calib_distance = 95;
-var black_val = 5;
+var black_val = 10;
 
 function rotateBot(direction, distance) {
     if (direction === "left") {
-       ev3.runForDistance(motorA, -distance, 100);
+       ev3.runForDistance(motorA, -distance, 50);
        ev3.runForDistance(motorB, distance, 100);
+       //ev3.stop(motorA);
     } else {
        ev3.runForDistance(motorA, distance, 100);
-       ev3.runForDistance(motorB, -distance, 100);
+       //ev3.stop(motorB);
+       ev3.runForDistance(motorB, -distance, 50);
     }
 //    ev3.pause(1000);
 }
 
-function moveForward() {
-    ev3.runForTime(motorA, 500, 50);
-    ev3.runForTime(motorB, 500, 50);
+function beeline() {
+       var intensity = ev3.reflectedLightIntensity(colorSensor);
+       if (intensity < black_val) {
+           rotateBot("left", calib_distance);
+           return beeline();
+       } else if (intensity >= black_val) {
+           rotateBot("right", calib_distance);
+           return beeline();
+       }
 }
 
-
-function isPath(direction, multiplier) {
-	if (direction === "left") {
-		rotateBot(direction, calib_distance * multiplier);
-	} else {
-		rotateBot(direction, calib_distance * multiplier);
-	}	
-    var intensity = ev3.reflectedLightIntensity(colorSensor);
-    var counter = 0;
-    while (intensity > black_val && counter < 100) {
-        intensity = ev3.reflectedLightIntensity(colorSensor);
-        //rotation_speed = ev3.gyroSensorRate(gyro);
-        counter = counter + 1;
-    }
-	ev3.stop(motorA);
-	ev3.stop(motorB);
-    return intensity < black_val;
-}
-
-function followLine() {
-    var intensity = ev3.reflectedLightIntensity(colorSensor);
-    while (intensity < black_val) {
-       moveForward(); 
-       intensity = ev3.reflectedLightIntensity(colorSensor);
-    }
-    ev3.stop(motorA);
-    ev3.stop(motorB);
-    if (isPath("left", 1)) {
-       followLine();
-    } else if (isPath("right", 2)) {
-       followLine();
-    } else if (isPath("left", 4)) {
-       followLine();
-    } else if (isPath("right", 8)) {
-       followLine();
-    } else {
-       console.log("SUCCESS");
-    }
-}
-
-
-followLine();
+beeline();

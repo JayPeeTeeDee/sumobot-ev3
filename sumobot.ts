@@ -53,6 +53,10 @@ function turnAntiClockwise() {
     ev3.runForTime(motorA, 1000, 500);
     ev3.runForTime(motorB, 1000, -500);
 }
+function move_forward(distance) {
+    ev3.runForDistance(motorA, distance, 700);
+    ev3.runForDistance(motorB, distance, 700);
+}
 
 function faceEnemy(bearing) {
     ev3.gyroSensorRateMode(gyroSensor);
@@ -129,10 +133,7 @@ function assault() {
 }
 
 
-function move_forward(distance) {
-    ev3.runForDistance(motorA, distance, 700);
-    ev3.runForDistance(motorB, distance, 700);
-}
+
 
 //Starter function
 ev3.waitForButtonPress();

@@ -37,7 +37,7 @@ if (ev3.connected(gyroSensor)) {
     source.alert("GYRO SENSOR CONNECTED");
 }
 
-function faceEnemy(bearing) {
+function turn(bearing) {
     ev3.gyroSensorRateMode(gyroSensor);
     ev3.gyroSensorAngleMode(gyroSensor);
     function leftBearingHit() {
@@ -55,6 +55,6 @@ function faceEnemy(bearing) {
 
 while(true) {
 	exec('aplay sounds/intro.wav');
-	faceEnemy(360);
+	turn(360);
 	ev3.pause(5000);
 }
