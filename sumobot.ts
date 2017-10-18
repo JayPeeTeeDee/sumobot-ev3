@@ -7,6 +7,7 @@ var motorB = ev3.motorB();
 var motorEye = ev3.motorC();
 var colorSensor = ev3.colorSensor();
 var ultrasonic = ev3.ultrasonicSensor();
+var touchSensor = ev3.touchSensor2();
 
 if (ev3.connected(motorA)) {
     source.alert("MOTOR A CONNECTED");
@@ -53,6 +54,13 @@ function search() {
    var object_distance = ev3.ultrasonicSensorDistance(ultrasonic);
    ev3.motorStop(motorEye);
    return object_distance <= target_distance ? object_distance : search(); 
+}
+
+function assault(object_distance) {
+    while (ev3.ultrasonicSensorDistance(ultrasonic) <= object_distance) {
+      ev3.runForTime(motorA, 1000, 200);
+      ev3.runForTime(motorB, 1000, 200);
+    }   
 }
 
 while(true) {
