@@ -40,4 +40,6 @@ if (ev3.connected(gyroSensor)) {
 
 while(true) {
     source.alert(ev3.reflectedLightIntensity(colorSensor));
+    source.alert("RED_VAL: " + ev3.colorSensorRed(colorSensor));
+    source.alert("GREEN_VAL: " +ev3.colorSensorGreen(colorSensor));
 }

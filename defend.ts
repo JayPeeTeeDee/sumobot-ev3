@@ -53,6 +53,15 @@ function faceEnemy(bearing) {
         ev3.runUntil(rightBearingHit, turnClockwise);
     }
 }
+function turnClockwise() {
+    ev3.runForTime(motorA, 1000, -500);
+    ev3.runForTime(motorB, 1000, 500);
+}
+
+function turnAntiClockwise() {
+    ev3.runForTime(motorA, 1000, 500);
+    ev3.runForTime(motorB, 1000, -500);
+}
 function move_forward(distance) {
     ev3.runForDistance(motorA, distance, 700);
     ev3.runForDistance(motorB, distance, 700);
